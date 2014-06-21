@@ -4,17 +4,22 @@ body{
 	font-family: sans-serif;
 	font-weight: 100;
 }
-#reps > div #profile{
-	font-size: 25px;
-	margin-bottom: 25px;
+#reps {
+	width:600px;
 }
-#reps > div #bills{
-	font-size: 20px;
+#reps > div{
+	border-bottom: 3px dashed #ccc;
+	padding-bottom: 50px;
+	margin-bottom: 50px;
 }
-#reps > div #bills li{
-	margin-bottom: 10px;
+#reps > div:last-child{
+	border-bottom: none;
 }
+#reps > div #profile{ font-size: 25px; }
+#reps > div #bills{ font-size: 20px; }
+#reps > div #bills li{ margin-bottom: 20px; }
 </style>
+
 <div id="reps"></div>
 
 <!-- DO YOUR REPRESENTATIVES REPRESENT YOU? -->
@@ -52,7 +57,12 @@ function createInfoDOM(rep,bills){
 		"<ol>";
 	for(var i=0;i<bills.results.length;i++){
 		var bill = bills.results[i];
-		html+="<li>"+bill.official_title+"</li>";
+		html+="<li>"+bill.official_title+"<br><br> <span style='font-size:15px'><b>Keywords:</b><br> ";
+		for(var j=0;j<bill.keywords.length;j++){
+			html += bill.keywords[j];
+			if(j<bill.keywords.length-1){ html+=", "; }
+		}
+		html+="</span></li>";
 	}
 	html+="</ol>"+
 		"</div>";
@@ -64,18 +74,24 @@ function createInfoDOM(rep,bills){
 
 }
 
-callSunlightAPI("/legislators/locate",{zip:94030})
-.then(function(reps){
-	var rep = reps.results[0];
+function createInfo(rep){
 	callSunlightAPI("/bills",{
 		sponsor_id: rep.bioguide_id,
-		per_page: 5
+		per_page: 5,
+		fields: "keywords,official_title"
 	})
 	.then(function(bills){
 		var infoDOM = createInfoDOM(rep,bills);
 		console.log(bills);
 		repsDOM.appendChild(infoDOM);
 	});
+}
+
+callSunlightAPI("/legislators/locate",{zip:94030})
+.then(function(reps){
+	for(var i=0;i<reps.results.length;i++){
+		createInfo(reps.results[i]);
+	}
 });
 
 
