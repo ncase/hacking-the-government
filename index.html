@@ -31,6 +31,15 @@ body{
 
 var repsDOM = document.querySelector("#reps");
 
+function getParameterByName(name) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(location.search);
+    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+}
+
+var myZIP = getParameterByName('zip') || 94030;
+
 function callSunlightAPI(resource,data){
 	data = JSON.parse(JSON.stringify(data));
 	data.apikey = "6303a3db19ec449d8678f67b78e9c74d";
@@ -87,7 +96,7 @@ function createInfo(rep){
 	});
 }
 
-callSunlightAPI("/legislators/locate",{zip:94030})
+callSunlightAPI("/legislators/locate",{zip:myZIP})
 .then(function(reps){
 	for(var i=0;i<reps.results.length;i++){
 		createInfo(reps.results[i]);
