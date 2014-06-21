@@ -1,0 +1,43 @@
+<style>
+body{
+	margin: 50px;
+	font-size: 25px;
+	font-family: sans-serif;
+	font-weight: 100;
+}
+</style>
+<div id="reps"></div>
+
+<!-- DO YOUR REPRESENTATIVES REPRESENT YOU? -->
+<!-- API Key: 6303a3db19ec449d8678f67b78e9c74d -->
+
+<script src="q.js"></script>
+<script src="reqwest.js"></script>
+<script>
+
+var url = "https://congress.api.sunlightfoundation.com"
+var resource = "/legislators/locate";
+var query = {
+	apikey: "6303a3db19ec449d8678f67b78e9c74d",
+	zip: 94030
+};
+
+var repsDOM = document.querySelector("#reps");
+
+reqwest({
+    url: url+resource,
+    crossOrigin: true,
+	data: query,
+	success: function(response){
+		console.log(response);
+		var reps = response.results;
+		for(var i=0;i<reps.length;i++){
+			var dom = document.createElement("div");
+			var rep = reps[i];
+			dom.innerHTML = rep.first_name + " " + rep.last_name;
+			repsDOM.appendChild(dom);
+		}
+    }
+});
+
+</script>
