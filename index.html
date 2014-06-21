@@ -1,9 +1,18 @@
 <style>
 body{
 	margin: 50px;
-	font-size: 25px;
 	font-family: sans-serif;
 	font-weight: 100;
+}
+#reps > div #profile{
+	font-size: 25px;
+	margin-bottom: 25px;
+}
+#reps > div #bills{
+	font-size: 20px;
+}
+#reps > div #bills li{
+	margin-bottom: 10px;
 }
 </style>
 <div id="reps"></div>
@@ -15,29 +24,59 @@ body{
 <script src="reqwest.js"></script>
 <script>
 
-var url = "https://congress.api.sunlightfoundation.com"
-var resource = "/legislators/locate";
-var query = {
-	apikey: "6303a3db19ec449d8678f67b78e9c74d",
-	zip: 94030
-};
-
 var repsDOM = document.querySelector("#reps");
 
-reqwest({
-    url: url+resource,
-    crossOrigin: true,
-	data: query,
-	success: function(response){
-		console.log(response);
-		var reps = response.results;
-		for(var i=0;i<reps.length;i++){
-			var dom = document.createElement("div");
-			var rep = reps[i];
-			dom.innerHTML = rep.first_name + " " + rep.last_name;
-			repsDOM.appendChild(dom);
-		}
-    }
+function callSunlightAPI(resource,data){
+	data = JSON.parse(JSON.stringify(data));
+	data.apikey = "6303a3db19ec449d8678f67b78e9c74d";
+	return reqwest({
+    	url: "https://congress.api.sunlightfoundation.com"+resource,
+    	crossOrigin: true,
+		data: data
+	});
+}
+
+function createInfoDOM(rep,bills){
+
+	var html = "";
+
+	// Create profile
+	html+="<div id='profile'>"+
+			rep.first_name + " " + rep.last_name+
+			"<br>"+
+			"Sponsored "+bills.count+" bills. Five most recent:"+
+		"</div>";
+
+	// Create list of bills
+	html+="<div id='bills'>"+
+		"<ol>";
+	for(var i=0;i<bills.results.length;i++){
+		var bill = bills.results[i];
+		html+="<li>"+bill.official_title+"</li>";
+	}
+	html+="</ol>"+
+		"</div>";
+
+	// Create the actual DOM
+	var dom = document.createElement("div");
+	dom.innerHTML = html;
+	return dom;
+
+}
+
+callSunlightAPI("/legislators/locate",{zip:94030})
+.then(function(reps){
+	var rep = reps.results[0];
+	callSunlightAPI("/bills",{
+		sponsor_id: rep.bioguide_id,
+		per_page: 5
+	})
+	.then(function(bills){
+		var infoDOM = createInfoDOM(rep,bills);
+		console.log(bills);
+		repsDOM.appendChild(infoDOM);
+	});
 });
+
 
 </script>
