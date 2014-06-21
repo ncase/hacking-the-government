@@ -15,7 +15,7 @@ body{
 #reps > div:last-child{
 	border-bottom: none;
 }
-#reps > div #profile{ font-size: 25px; }
+#reps > div #profile{ font-size: 20px; }
 #reps > div #bills{ font-size: 20px; }
 #reps > div #bills li{ margin-bottom: 20px; }
 </style>
@@ -56,9 +56,16 @@ function createInfoDOM(rep,bills){
 
 	// Create profile
 	html+="<div id='profile'>"+
-			rep.first_name + " " + rep.last_name+
+			"<img src='http://theunitedstates.io/images/congress/225x275/"+rep.bioguide_id+".jpg'/>"+
+			"<br><br>"+
+			"<span style='font-size:30px'>"+rep.first_name + " " + rep.last_name+"</span>"+
 			"<br>"+
-			"Sponsored "+bills.count+" bills. Five most recent:"+
+			"Phone: "+rep.phone+
+			"<br>"+
+			"Tweet: <a href='http://twitter.com/"+rep.twitter_id+"'>@"+rep.twitter_id+"</a>"+
+			"<br>"+
+			"<br>"+
+			"<b>Sponsored "+bills.count+" bills. Five most recent:</b>"+
 		"</div>";
 
 	// Create list of bills
